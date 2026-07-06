@@ -12,7 +12,7 @@ class Settings:
     def validate(self):
         if not self.GEMINI_API_KEY:
             raise ValueError(
-                "GEMINI_API_KEY is missing. Please check your .env file."
+                "GEMINI_API_KEY is missing. Please configure your .env file."
             )
 
 

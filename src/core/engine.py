@@ -1,14 +1,10 @@
-from llm.gemini_chat import GeminiChatClient
+from llm.gemini import GeminiLLM
 
-from llm.factory import get_llm
-llm = get_llm()
+llm = GeminiLLM()
 
 
 def process_query(query: str):
-
-    
     """
-    Process a user's query and return the AI response
-
+    Process a user query and return a streaming generator.
     """
     return llm.stream_message(query)
