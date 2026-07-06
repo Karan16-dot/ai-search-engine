@@ -2,10 +2,11 @@ import time
 
 from rich.console import Console
 
-from core.engine import process_query
+from services.chat_service import ChatService
 from utils.logger import logger
 
 console = Console()
+chat_service = ChatService()
 
 
 def start_chat():
@@ -27,7 +28,9 @@ def start_chat():
         # Exit application
         if user_input.lower() in ["exit", "quit", "bye"]:
             logger.info("Application closed by user.")
-            console.print("\n👋 Goodbye! See you soon.", style="bold red")
+            console.print(
+                "\n[bold red]👋 Goodbye! See you soon.[/bold red]"
+            )
             break
 
         logger.info("User Query: %s", user_input)
@@ -37,21 +40,24 @@ def start_chat():
 
             console.print("\n[bold green]AI:[/bold green] ", end="")
 
-            for chunk in process_query(user_input):
+            for chunk in chat_service.stream_response(user_input):
                 console.print(chunk, end="")
 
             elapsed = time.perf_counter() - start_time
 
             console.print()
             console.print(
-                f"\n[dim]Response generated in {elapsed:.2f} seconds[/dim]"
+                f"[dim]Response generated in {elapsed:.2f} seconds[/dim]\n"
             )
 
-            logger.info("Response completed in %.2f seconds", elapsed)
+            logger.info(
+                "Response generated successfully in %.2f seconds",
+                elapsed
+            )
 
         except Exception:
             logger.exception("Unexpected error while processing request.")
 
             console.print(
-                "\n[bold red]Something went wrong while generating the response.[/bold red]"
+                "\n[bold red]An unexpected error occurred while generating the response.[/bold red]\n"
             )
