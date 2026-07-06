@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-class GeminiChatClient:
+class GeminiLLM(BaseLLM):
 
     def __init__(self):
         self.client = genai.Client(
@@ -15,5 +15,5 @@ class GeminiChatClient:
         )
 
     def send_message(self,message:str)->str:
-        response = self.chat.send_message(message)
-        return response.text
+       for chunk in self.chat.send_message_stream(message):
+       yield chunk.text
