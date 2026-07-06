@@ -1,13 +1,10 @@
-from llm.client import generate_response
-def process_query(user_query: str)->str:
+from llm.gemini_chat import GeminiChatClient
+
+chat_client = GeminiChatClient()
+
+def process_query(query: str)->str:
     """
     Process a user's query and return the AI response
 
     """
-    try:
-        return generate_response(user_query)
-
-    except Exception as e:
-        return f"Something went wrong: {e}"
-
-    return response
+    return chat_client.send_message(query)
