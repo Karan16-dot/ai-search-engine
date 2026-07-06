@@ -15,23 +15,25 @@ def start_chat():
     while True:
         user_input = console.input("\n[bold cyan]You:[/bold cyan] ")
 
-        # Ignore empty input
+        # Ignore empty messages
         if not user_input.strip():
             continue
 
-        # Exit condition
+        # Exit application
         if user_input.lower() in ["exit", "quit", "bye"]:
             console.print("\n👋 Goodbye! See you soon.", style="bold red")
             break
 
         try:
-            response = process_query(user_input)
+            console.print("\n[bold green]AI:[/bold green] ", end="")
 
-            console.print(
-                f"\n[bold green]AI:[/bold green] {response}\n"
-            )
+            # Stream the response token by token
+            for chunk in process_query(user_input):
+                console.print(chunk, end="")
+
+            console.print("\n")
 
         except Exception as e:
             console.print(
-                f"\n[bold red]Error:[/bold red] {e}\n"
+                f"\n[bold red]Error:[/bold red] {str(e)}\n"
             )
