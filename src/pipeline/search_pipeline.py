@@ -1,39 +1,28 @@
 from models.response import AIResponse
-from retrieval.prompt_builder import PromptBuilder
-from retrieval.retrieval_service import RetrievalService
-from search.query_rewriter import QueryRewriter
-
-from core.engine import process_query
+from pipeline.llm_stage import LLMStage
+from pipeline.prompt_stage import PromptStage
+from pipeline.retrieval_stage import RetrievalStage
 
 
 class SearchPipeline:
-    """
-    Orchestrates the complete AI Search pipeline.
-    """
 
     def __init__(self):
 
-        self.query_rewriter = QueryRewriter()
+        self.retrieval = RetrievalStage()
 
-        self.retrieval = RetrievalService()
+        self.prompt = PromptStage()
 
-        self.prompt_builder = PromptBuilder()
+        self.llm = LLMStage()
 
-    def run(self, query: str) -> AIResponse:
+    def run(self, query: str):
 
-        rewritten_query = self.query_rewriter.rewrite(query)
+        search_response = self.retrieval.run(query)
 
-        search_response = self.retrieval.search(
-            rewritten_query
-        )
+        prompt = self.prompt.run(search_response)
 
-        prompt = self.prompt_builder.build(
-            search_response
-        )
-
-        answer = process_query(prompt)
+        answer = self.llm.run(prompt)
 
         return AIResponse(
             answer=answer,
-            sources=search_response.results
+            sources=search_response.results,
         )
