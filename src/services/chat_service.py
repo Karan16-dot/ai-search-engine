@@ -1,4 +1,6 @@
 from core.engine import process_query, stream_query
+from retrieval.prompt_builder import PromptBuilder
+from retrieval.retrieval_service import RetrievalService
 
 
 class ChatService:
@@ -6,16 +8,32 @@ class ChatService:
     Handles chat-related business logic.
     """
 
+    def __init__(self):
+        self.retrieval = RetrievalService()
+        self.prompt_builder = PromptBuilder()
+
     async def chat(self, query: str) -> str:
         """
-        Generate the complete response.
-        Used by the REST API.
+        Search the web, build a prompt, and generate a grounded response.
         """
-        return process_query(query)
+
+        search_response = self.retrieval.search(query)
+
+        prompt = self.prompt_builder.build(
+            search_response
+        )
+
+        return process_query(prompt)
 
     def stream_response(self, query: str):
         """
-        Stream the response.
-        Used by the CLI.
+        Stream grounded responses.
         """
-        return stream_query(query)
+
+        search_response = self.retrieval.search(query)
+
+        prompt = self.prompt_builder.build(
+            search_response
+        )
+
+        return stream_query(prompt)
