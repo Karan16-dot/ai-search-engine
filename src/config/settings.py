@@ -1,31 +1,23 @@
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
+class Settings(BaseSettings):
     """
-    Centralized application configuration.
+    Application configuration.
     """
 
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+    GEMINI_API_KEY: str = Field(...)
 
-    MODEL_NAME = "gemini-2.5-flash"
+    TAVILY_API_KEY: str = Field(...)
 
-    def validate(self):
-        if not self.GEMINI_API_KEY:
-            raise ValueError(
-                "GEMINI_API_KEY is missing. Please check your .env file."
-            )
+    MODEL_NAME: str = "gemini-2.5-flash"
 
-        if not self.TAVILY_API_KEY:
-            raise ValueError(
-                "TAVILY_API_KEY is missing. Please check your .env file."
-            )
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 settings = Settings()
-settings.validate()
