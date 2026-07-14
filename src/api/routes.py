@@ -11,28 +11,23 @@ chat_service = ChatService()
 
 @router.post(
     "/chat",
-    response_model=ChatResponse
+    response_model=ChatResponse,
+    summary="Chat with AI",
+    description="Send a prompt to the AI model and receive a response."
 )
-def chat(request: ChatRequest):
+async def chat(request: ChatRequest):
 
     logger.info("API Request: %s", request.message)
 
     try:
-
-        response = ""
-
-        for chunk in chat_service.stream_response(
-            request.message
-        ):
-            response += chunk
+        response = await chat_service.chat(request.message)
 
         return ChatResponse(
             response=response
         )
 
-    except Exception as e:
-
-        logger.exception(e)
+    except Exception:
+        logger.exception("Error while processing API request.")
 
         raise HTTPException(
             status_code=500,
