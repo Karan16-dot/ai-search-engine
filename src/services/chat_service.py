@@ -1,39 +1,13 @@
-from core.engine import process_query, stream_query
-from retrieval.prompt_builder import PromptBuilder
-from retrieval.retrieval_service import RetrievalService
+from pipeline.search_pipeline import SearchPipeline
 
 
 class ChatService:
-    """
-    Handles chat-related business logic.
-    """
 
     def __init__(self):
-        self.retrieval = RetrievalService()
-        self.prompt_builder = PromptBuilder()
+        self.pipeline = SearchPipeline()
 
-    async def chat(self, query: str) -> str:
-        """
-        Search the web, build a prompt, and generate a grounded response.
-        """
-
-        search_response = self.retrieval.search(query)
-
-        prompt = self.prompt_builder.build(
-            search_response
-        )
-
-        return process_query(prompt)
+    async def chat(self, query: str):
+        return self.pipeline.run(query)
 
     def stream_response(self, query: str):
-        """
-        Stream grounded responses.
-        """
-
-        search_response = self.retrieval.search(query)
-
-        prompt = self.prompt_builder.build(
-            search_response
-        )
-
-        return stream_query(prompt)
+        return self.pipeline.stream(query)
