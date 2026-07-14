@@ -1,25 +1,48 @@
-from search.models import SearchResult
+from retrieval.models import SearchResponse
 
 
 class PromptBuilder:
+    """
+    Responsible for constructing prompts sent to the LLM.
+    """
+
+    SYSTEM_PROMPT = """
+You are an AI Search Assistant.
+
+Your responsibilities:
+
+- Answer using ONLY the provided search results.
+- If the answer is unavailable, clearly say so.
+- Be factual.
+- Be concise.
+- Never hallucinate information.
+- Mention sources naturally when appropriate.
+"""
 
     def build(
         self,
-        query: str,
-        results: list[SearchResult]
+        search_response: SearchResponse
     ) -> str:
 
-        prompt = f"Answer the following question using the provided search results.\n\n"
+        prompt = self.SYSTEM_PROMPT.strip()
 
-        prompt += f"Question:\n{query}\n\n"
+        prompt += "\n\n"
+
+        prompt += f"User Question:\n{search_response.query}\n\n"
 
         prompt += "Search Results:\n\n"
 
-        for result in results:
-            prompt += f"Title: {result.title}\n"
-            prompt += f"URL: {result.url}\n"
-            prompt += f"Content: {result.content}\n\n"
+        for index, result in enumerate(search_response.results, start=1):
 
-        prompt += "Provide a helpful and factual answer."
+            prompt += (
+                f"Result {index}\n"
+                f"Title: {result.title}\n"
+                f"URL: {result.url}\n"
+                f"Content: {result.content}\n\n"
+            )
+
+        prompt += (
+            "Answer the user's question using only the search results above."
+        )
 
         return prompt
