@@ -1,5 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
+
+from fastapi.responses import StreamingResponse
+
+from api.stream import generate_stream
+
+
 from api.schemas import ChatRequest, ChatResponse
 from services.chat_service import ChatService
 from utils.logger import logger
@@ -33,3 +39,12 @@ async def chat(request: ChatRequest):
             status_code=500,
             detail="Internal Server Error"
         )
+
+
+@router.post("/stream")
+async def stream_chat(request: ChatRequest):
+
+    return StreamingResponse(
+        generate_stream(request.message),
+        media_type="text/event-stream",
+    )
